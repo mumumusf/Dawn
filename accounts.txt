@@ -1,0 +1,20 @@
+# 格式：邮箱----密码----代理地址
+# 每行包含一个账号的所有信息，包括邮箱、密码和对应的代理
+
+# 示例1：使用IP:端口:用户名:密码格式的代理
+#user1@example.com----password123----119.42.39.72:5700:YOYOZZLH:YOYOZZLH
+
+# 示例2：使用HTTP代理格式
+#user2@example.com----password456----http://username:password@host:port
+
+# 示例3：使用IP:端口格式的代理
+#user3@example.com----password789----119.42.39.72:5700
+
+# 示例4：使用SOCKS代理
+#user4@example.com----password000----socks5://username:password@host:port
+
+# 系统会自动将账号与代理绑定，确保每个账号使用指定的代理
+# 账号会被保存到accounts.json
+# 代理会被保存到proxy.txt
+
+sw2332834939@gmail.com----1314520Sw@----119.42.39.72:5700:YOYOZZLH:YOYOZZLH

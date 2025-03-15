@@ -160,7 +160,7 @@ function loadAccountsAndProxiesFromFile(filePath) {
           const password = parts[1].trim();
           const proxy = parts[2].trim();
           
-          if (email && password && proxy) {
+          if (email && password) {
             const account = {
               email: email,
               password: password,
@@ -172,10 +172,12 @@ function loadAccountsAndProxiesFromFile(filePath) {
             accounts.push(account);
             
             // 将代理与账号关联
-            proxies.push(proxy);
-            accountProxyMap.set(email, proxy);
+            if (proxy) {
+              proxies.push(proxy);
+              accountProxyMap.set(email, proxy);
+            }
             
-            logMessage(null, null, `已加载账号: ${email} 及其对应代理`, "info");
+            logMessage(null, null, `已加载账号: ${email}${proxy ? ' 及其对应代理' : ''}`, "info");
           } else {
             logMessage(null, null, `跳过无效行: ${trimmedLine}`, "warning");
           }
@@ -251,6 +253,17 @@ async function main() {
       let continueAdding = true;
       let accountCount = 0;
       
+      // 尝试从accounts.json加载已存在的账号信息
+      let existingAccounts = [];
+      try {
+        if (fs.existsSync("accounts.json")) {
+          existingAccounts = JSON.parse(fs.readFileSync("accounts.json", "utf8"));
+          logMessage(null, null, `已从accounts.json加载 ${existingAccounts.length} 个已存在的账号信息`, "info");
+        }
+      } catch (error) {
+        logMessage(null, null, `加载accounts.json失败: ${error.message}，将创建新的账号`, "warning");
+      }
+      
       while (continueAdding) {
         accountCount++;
         logMessage(null, null, `正在配置第 ${accountCount} 个账号`, "info");
@@ -258,14 +271,21 @@ async function main() {
         const email = await askQuestion("请输入邮箱: ");
         const password = await askQuestion("请输入密码: ");
         
+        // 查找是否已存在该账号的信息
+        const existingAccount = existingAccounts.find(acc => acc.email === email);
+        
         const account = {
           email: email,
           password: password,
           data: {
-            appid: "",
-            token: ""
+            appid: existingAccount ? existingAccount.data.appid : "",
+            token: existingAccount ? existingAccount.data.token : ""
           }
         };
+        
+        if (existingAccount && existingAccount.data.appid && existingAccount.data.token) {
+          logMessage(null, null, `已从accounts.json加载账号 ${email} 的AppID和Token`, "success");
+        }
         
         // 询问是否使用代理
         const useProxy = await askQuestion("是否使用代理? (y/n): ");
@@ -310,12 +330,33 @@ async function main() {
       const actualFilePath = filePath.trim() || "accounts.txt";
       
       try {
+        // 尝试从accounts.json加载已存在的账号信息
+        let existingAccounts = [];
+        try {
+          if (fs.existsSync("accounts.json")) {
+            existingAccounts = JSON.parse(fs.readFileSync("accounts.json", "utf8"));
+            logMessage(null, null, `已从accounts.json加载 ${existingAccounts.length} 个已存在的账号信息`, "info");
+          }
+        } catch (error) {
+          logMessage(null, null, `加载accounts.json失败: ${error.message}，将创建新的账号`, "warning");
+        }
+        
         // 从文本文件加载账号和代理
         const { accounts: loadedAccounts, proxies: loadedProxies, accountProxyMap: loadedMap } = loadAccountsAndProxiesFromFile(actualFilePath);
         
         if (loadedAccounts.length === 0) {
           logMessage(null, null, "未在文件中找到有效账号", "error");
           process.exit(1);
+        }
+        
+        // 将已存在的AppID和Token合并到加载的账号中
+        for (const account of loadedAccounts) {
+          const existingAccount = existingAccounts.find(acc => acc.email === account.email);
+          if (existingAccount && existingAccount.data && existingAccount.data.appid && existingAccount.data.token) {
+            account.data.appid = existingAccount.data.appid;
+            account.data.token = existingAccount.data.token;
+            logMessage(null, null, `已从accounts.json加载账号 ${account.email} 的AppID和Token`, "success");
+          }
         }
         
         accounts = loadedAccounts;

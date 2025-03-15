@@ -4,8 +4,6 @@
 
 [中文](README.md) | [English](README_EN.md)
   
-![DAWN Validator](https://raw.githubusercontent.com/mumumusf/Dawn/main/assets/logo.png)
-
 **Automate DAWN Validator account maintenance and easily earn points**
 
 </div>

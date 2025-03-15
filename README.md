@@ -4,8 +4,6 @@
 
 [中文](README.md) | [English](README_EN.md)
   
-![DAWN验证器](https://raw.githubusercontent.com/mumumusf/Dawn/main/assets/logo.png)
-
 **自动化DAWN验证器账户保活，轻松赚取积分**
 
 </div>

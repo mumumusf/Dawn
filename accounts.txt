@@ -16,5 +16,3 @@
 # 系统会自动将账号与代理绑定，确保每个账号使用指定的代理
 # 账号会被保存到accounts.json
 # 代理会被保存到proxy.txt
-
-sw2332834939@gmail.com----1314520Sw@----119.42.39.72:5700:YOYOZZLH:YOYOZZLH
